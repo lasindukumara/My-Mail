@@ -1,65 +1,10 @@
-// Import required modules
-const express = require("express");
-const cors = require("cors");
-const nodemailer = require("nodemailer");
-const app = express();
-
-// Define the port the server will run on
-const port = 3001;
-
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-app.use(
-  cors({
-    origin: "*",
-  })
-);
-
-// Home route
-app.get("/", (req, res) => {
-  res.send("Welcome to the Email Sender Project!");
-});
-
-// Email sending route with custom template
-app.post("/send-email", async (req, res) => {
-  const { to, subject, name, customMessage, cc, bcc, Closing } = req.body;
-
-  if (!to || !subject || !name || !customMessage) {
-    return res
-      .status(400)
-      .json({ message: "To, subject, name, and customMessage are required!" });
-  }
-
-  try {
-    // Configure Nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "lasindukumara2020@gmail.com", // Replace with your Gmail address
-        pass: "qtkecpvnscgdwuhp", // Replace with your Gmail App Password
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    // Define the HTML template
-    const emailTemplate = `
 <!DOCTYPE html>
 <html>
   <head>
-
-        <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Email Template</title>
     <style> 
-    *{
-      margin: 0;
-        padding: 0;
-    }
       body {
-       width: 100%;
         font-family: Arial, sans-serif;
         line-height: 1.6;
         color: #333;
@@ -69,11 +14,11 @@ app.post("/send-email", async (req, res) => {
       }
 
       .container {
-        width: 95%;
-    max-width: 1400px;
-margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
+        width: 95vw;
+        max-width: 1200px;
+        margin: 20px auto;
         background: #fff;
-       padding: 2.5%;
+        padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
@@ -117,7 +62,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       }
 
       .signature p {
-        font-size: small;
+        font-size: medium;
       }
 
       .signature img {
@@ -205,6 +150,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
         font-size: 12px;
         text-align: center;
         width: 100%;
+      
       }
 
       .footer .footer-bottom a {
@@ -224,21 +170,6 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
           margin-bottom: 20px;
         }
       }
-
-
-
-
-
-
-     /* Responsive Design */
-      @media screen and (max-width: 360px) {
-                .signature p {
-        font-size: x-small;
-     
-      }
-
-
-    }
     </style>
 
   </head>
@@ -396,41 +327,3 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
     </div>
   </body>
 </html>
-
- `;
-
-    // Define email options
-    const mailOptions = {
-      from: "lasindukumara2020@gmail.com", // Replace with your email address
-      to: to, // Add recipient email
-      cc: cc, // Add cc field
-      bcc: bcc, // Add bcc field
-      subject: subject,
-      customMessage: customMessage,
-      Closing: Closing,
-      html: emailTemplate,
-    };
-
-    // Send the email
-    const info = await transporter.sendMail(mailOptions);
-
-    res.json({
-      message: "Email sent successfully!",
-      info: info,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to send email", error: error.message });
-  }
-});
-
-// 404 Route (matches undefined routes)
-app.use((req, res) => {
-  res.status(404).send("Sorry, the page you are looking for does not exist!");
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});

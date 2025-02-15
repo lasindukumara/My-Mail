@@ -1,79 +1,24 @@
-// Import required modules
-const express = require("express");
-const cors = require("cors");
-const nodemailer = require("nodemailer");
-const app = express();
-
-// Define the port the server will run on
-const port = 3001;
-
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-app.use(
-  cors({
-    origin: "*",
-  })
-);
-
-// Home route
-app.get("/", (req, res) => {
-  res.send("Welcome to the Email Sender Project!");
-});
-
-// Email sending route with custom template
-app.post("/send-email", async (req, res) => {
-  const { to, subject, name, customMessage, cc, bcc, Closing } = req.body;
-
-  if (!to || !subject || !name || !customMessage) {
-    return res
-      .status(400)
-      .json({ message: "To, subject, name, and customMessage are required!" });
-  }
-
-  try {
-    // Configure Nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "lasindukumara2020@gmail.com", // Replace with your Gmail address
-        pass: "qtkecpvnscgdwuhp", // Replace with your Gmail App Password
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    // Define the HTML template
-    const emailTemplate = `
 <!DOCTYPE html>
 <html>
   <head>
-
-        <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Email Template</title>
-    <style> 
-    *{
-      margin: 0;
-        padding: 0;
-    }
+    <style>
       body {
-       width: 100%;
         font-family: Arial, sans-serif;
         line-height: 1.6;
         color: #333;
-        background-color: #f5f5f5; /* Changed */
+        background-color: rgb(143, 145, 133);
         margin: 0;
         padding: 0;
       }
 
       .container {
-        width: 95%;
-    max-width: 1400px;
-margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
+        width: 95vw;
+        max-width: 1200px;
+        margin: 20px auto;
         background: #fff;
-       padding: 2.5%;
+        padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
@@ -84,7 +29,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       }
 
       .header h1 {
-        color: #003366; /* Deep blue for header text */
+        color: #007bff;
       }
 
       .header img {
@@ -117,7 +62,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       }
 
       .signature p {
-        font-size: small;
+        font-size: medium;
       }
 
       .signature img {
@@ -127,21 +72,33 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       }
 
       .footer {
-        background-color: #003366; /* Dark navy */
+        background-color: #007bff;
         padding: 30px;
-        border-top: 5px solid #ffbb00; /* Accent gold */
+        border-top: 5px solid #004085;
         border-radius: 0 0 8px 8px;
         text-align: center;
         margin-top: 20px;
         font-size: 12px;
-        color: #ffffff; /* White text for contrast */
+        color: #aaa;
       }
 
       .footer-container {
-        position: relative; 
+        position: relative; /* Needed for positioning the pseudo element */
         display: flex;
-        align-items: stretch; 
+        align-items: stretch; /* Ensure both columns stretch to the same height */
         justify-content: space-between;
+      }
+
+      /* Create the vertical line using a pseudo element on the container */
+      .footer-container::before {
+        content: "";
+        position: absolute;
+        width: 2px; /* Adjust width as needed */
+        background-color: #000; /* Set desired color */
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       /* Optional: Adjust left and right columns */
@@ -150,6 +107,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
         width: 45%;
       }
 
+      /* Example image styling for left column */
       .footer-left img {
         margin: 20px 0;
         width: 30vw;
@@ -159,6 +117,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
 
       .footer-right {
         padding-left: 20px;
+        color: white;
         text-align: left;
       }
 
@@ -184,7 +143,7 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
 
       .footer .social-media a {
         display: block;
-        color: #ffffff;
+        color: white;
         margin: 10px 0;
         text-decoration: none;
         font-size: 18px;
@@ -197,18 +156,19 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       }
 
       .footer .social-media a:hover {
-        color: #ffbb00;
+        color: #ddd;
       }
 
       .footer .footer-bottom {
         margin-top: 20px;
         font-size: 12px;
+        color: #ddd;
         text-align: center;
         width: 100%;
       }
 
       .footer .footer-bottom a {
-        color: #ffbb00;
+        color: #ddd;
         text-decoration: none;
       }
 
@@ -223,24 +183,10 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
           width: 100%;
           margin-bottom: 20px;
         }
+
+        
       }
-
-
-
-
-
-
-     /* Responsive Design */
-      @media screen and (max-width: 360px) {
-                .signature p {
-        font-size: x-small;
-     
-      }
-
-
-    }
     </style>
-
   </head>
   <body>
     <div class="container">
@@ -276,50 +222,38 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
       <!-- Footer Section -->
       <div class="footer">
         <div class="footer-container">
-          <div
-            style="
-              display: flex;
-              align-items: stretch;
-              max-width: 600px;
-              margin: 0 auto;
-            "
-          >
-            <!-- Left Content -->
-            <div class="footer-left" style="width: 45%; padding: 10px">
-              <img
-                src="https://drive.usercontent.google.com/download?id=1dL1r_M4xAt7xychPdnYb8JJPx34FHEZJ&export=view&authuser=0"
-                alt="A.H.K.Lasindu Kumara"
-                style="width: 100%; max-width: 200px; border-radius: 50%"
-              />
-            </div>
-
-            <!-- Vertical Line -->
-            <div style="width: 2px; background-color: #000"></div>
-
-            <!-- Right Content -->
-            <div class="footer-right" style="width: 45%; padding: 10px;">
-              <h3 style="margin: 0">A.H.K Lasindu Kumara</h3>
-              <p style="font-size: 14px; margin: 5px 0">
-                <strong>Undergraduate</strong><br />
-                University of Colombo
-              </p>
-              <p style="font-size: 14px; margin: 5px 0">
+          <!-- Left Column: Contact Info -->
+          <div class="footer-left">
+            <img
+              src="https://drive.usercontent.google.com/download?id=1dL1r_M4xAt7xychPdnYb8JJPx34FHEZJ&export=view&authuser=0"
+              alt="A.H.K.Lasindu Kumara"
+              class="logo"
+            />
+          </div>
+          <div class="vertical-line"></div>
+          <!-- Right Column: Social Media Links -->
+          <div class="footer-right">
+            <h3>A.H.K Lasindu Kumara</h3>
+            <p>
+              <strong>Undergraduate</strong><br />
+              University of Colombo
+            </p>
+            <div class="contact-info">
+              <p>
                 <strong>Email:</strong>
                 <a
                   href="mailto:lasindukumara2020@gmail.com"
-                  style=" text-decoration: none"
+                  style="color: white"
                   >lasindukumara2020@gmail.com</a
                 >
               </p>
-              <p style="font-size: 14px; margin: 5px 0">
+              <p>
                 <strong>Phone:</strong>
-                <a
-                  href="tel:+94762515384"
-                  style="text-decoration: none"
-                  >+94 76 2515384</a
+                <a style="color: white" href="tel:+94762515384">
+                  +94 76 2515384</a
                 >
               </p>
-              <p style="font-size: 14px; margin: 5px 0">
+              <p>
                 <strong>Address:</strong> 37/7, Sri Hemanandha Mawtha,
                 Bataganvila, Galle.
               </p>
@@ -396,41 +330,3 @@ margin: 20px auto 0 auto; /* or simply margin: 20px auto; */
     </div>
   </body>
 </html>
-
- `;
-
-    // Define email options
-    const mailOptions = {
-      from: "lasindukumara2020@gmail.com", // Replace with your email address
-      to: to, // Add recipient email
-      cc: cc, // Add cc field
-      bcc: bcc, // Add bcc field
-      subject: subject,
-      customMessage: customMessage,
-      Closing: Closing,
-      html: emailTemplate,
-    };
-
-    // Send the email
-    const info = await transporter.sendMail(mailOptions);
-
-    res.json({
-      message: "Email sent successfully!",
-      info: info,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to send email", error: error.message });
-  }
-});
-
-// 404 Route (matches undefined routes)
-app.use((req, res) => {
-  res.status(404).send("Sorry, the page you are looking for does not exist!");
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
