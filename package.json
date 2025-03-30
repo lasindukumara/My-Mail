@@ -2,6 +2,9 @@
   "name": "my-mail",
   "version": "1.0.0",
   "main": "index.js",
+  "bin": {
+    "my-mail": "./index.js"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -14,6 +17,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "open": "^10.1.0"
   }
 }
